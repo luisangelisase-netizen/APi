@@ -1,0 +1,115 @@
+*{margin:0;padding:0;box-sizing:border-box}
+
+
+body{
+    font-family:Arial;
+    min-height:100vh;
+    background:url("fundo2.webp") center/cover fixed;
+    padding:25px;
+}
+
+
+.logo{
+    width:140px;
+    position:absolute;
+    top:20px;
+    left:20px;
+}
+
+
+.topo{
+    position:absolute;
+    top:25px;
+    right:25px;
+}
+
+
+input,button{
+    border:0;
+    border-radius:10px;
+    padding:12px;
+    font-size:16px;
+}
+
+
+button{
+    cursor:pointer;
+    background:#ff914d;
+    color:white;
+    font-weight:bold;
+}
+
+
+.pesquisa,.categorias,.acoes{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+
+.pesquisa{margin-top:150px}
+
+
+.pesquisa input{width:380px}
+
+/* Espaçamento dos botões de categoria */
+.categorias{margin:15px}
+
+/* Botões brancos: categorias e favoritos */
+.categorias button,.topo button{
+    background:white;
+    color:#7a3b18;
+}
+
+/* Títulos dos cards */
+h2{
+    text-align:center;
+    margin:10px;
+}
+
+/* Área onde receitas e favoritos aparecem em formato de grade */
+#resultado,#favoritos{
+    width:90%;
+    margin:25px auto;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:18px;
+}
+
+/* Card individual de cada receita */
+.card{
+    background:white;
+    padding:15px;
+    border-radius:15px;
+    text-align:center;
+}
+
+/* Imagem da receita dentro do card */
+.card img{
+    width:100%;
+    border-radius:10px;
+}
+
+/* Textos dentro do card */
+.card p{
+    text-align:left;
+    margin:8px 0;
+}
+
+/* Área onde aparece a dica do Ratatuin IA */
+.ia{
+    display:none;
+    background:#fff3d9;
+    padding:10px;
+    margin-top:10px;
+    border-radius:10px;
+    text-align:left;
+}
+
+/* Mensagens como "Buscando..." ou "Nenhuma receita encontrada" */
+.msg{
+    color:white;
+    text-align:center;
+    grid-column:1/-1;
+}

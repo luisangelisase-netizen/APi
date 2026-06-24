@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ratatuin GPT</title>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- Logo do site -->
+<img class="logo" src="rat sem fundo.png" alt="Logo">
+
+
+<div class="topo">
+    <button onclick="mostrarFavoritos()">❤️ Favoritos</button>
+</div>
+
+
+<div class="pesquisa">
+    <input id="input" placeholder="Procure uma comida...">
+    <button onclick="buscar()">🔎 Pesquisar</button>
+</div>
+
+
+<div class="categorias">
+    <button onclick="categoria('Pizza')">🍕 Pizza</button>
+    <button onclick="categoria('Burger')">🍔 Burger</button>
+    <button onclick="categoria('Pasta')">🍝 Pasta</button>
+    <button onclick="categoria('Chicken')">🍗 Chicken</button>
+    <button onclick="categoria('Cake')">🍰 Dessert</button>
+</div>
+
+<!-- Local onde aparecem os resultados da API TheMealDB -->
+<div id="resultado">
+    <p class="msg">Pesquise uma comida.</p>
+</div>
+
+<!-- Área escondida inicialmente; mostra receitas salvas no MockAPI -->
+<div id="areaFavoritos" style="display:none">
+    <h2 style="color:white">❤️ Meus favoritos</h2>
+    <div id="favoritos"></div>
+</div>
+
+<script>
+/* URL da API pública TheMealDB, usada para buscar receitas */
+const MEALS="https://www.themealdb.com/api/json/v1/1/search.php?s=";
+
+/* DATOS DE BANCOS*/
+const FAVORITOS="https://6a3bd080e4a07f202e15ea6c.mockapi.io/Data_de_dados/Favorito";
+
+
+const resultado=document.getElementById("resultado");
+const favoritos=document.getElementById("favoritos");
+const input=document.getElementById("input");
+
+
+input.addEventListener("keydown",e=>{
+    if(e.key==="Enter") buscar();
+});
+
+
+function categoria(nome){
+    input.value=nome;
+    buscar();
+}
+
+/*
+Função card():
+Cria o HTML de cada card de receita.
+
+- Se favorito for false: mostra uma receita vinda da API TheMealDB.
+- Se favorito for true: mostra uma receita salva no MockAPI.
+*/
+function card(receita,favorito=false){
+    const nome=favorito ? receita.name : receita.strMeal;
+    const imagem=favorito ? receita.imagem : receita.strMealThumb;
+    const categoria=favorito ? receita.categoria : receita.strCategory;
+    const origem=favorito ? receita.origem : receita.strArea;
+
+    return `
+    <div class="card">
+        <h2>${nome}</h2>
+        <img src="${imagem}" alt="${nome}">
+        <p><b>Categoria:</b> ${categoria}</p>
+        <p><b>Origem:</b> ${origem}</p>
+
+        <div class="acoes">
+            ${
+                favorito
+                ? `
+                    <!-- Se estiver nos favoritos, mostra botão para apagar -->
+                    <button onclick="remover('${receita.id}')">
+                        🗑 Remover
+                    </button>
+                  `
+                : `
+                    <!-- Se for uma receita pesquisada, permite salvar no banco -->
+                    <button onclick='salvar(
+                        ${JSON.stringify(nome)},
+                        ${JSON.stringify(imagem)},
+                        ${JSON.stringify(categoria)},
+                        ${JSON.stringify(origem)}
+                    )'>
+                        ❤️ Favoritar
+                    </button>
+
+                    <!-- Mostra uma dica de preparo gerada pelo Ratatuin IA -->
+                    <button onclick='dica(${JSON.stringify(nome)},this)'>
+                        ✨ Ratatuin IA
+                    </button>
+                  `
+            }
+        </div>
+
+        <!-- Área vazia que receberá a dica de IA -->
+        ${favorito ? "" : `<div class="ia"></div>`}
+    </div>`;
+}
+
+async function buscar(){
+    const comida=input.value.trim();
+
+    if(!comida){
+        resultado.innerHTML="<p class='msg'>Digite uma comida.</p>";
+        return;
+    }
+
+    /* Esconde favoritos quando uma nova pesquisa começa */
+    document.getElementById("areaFavoritos").style.display="none";
+    resultado.innerHTML="<p class='msg'>Buscando...</p>";
+
+    try{
+        /* fetch busca dados da API; then transforma a resposta em JSON */
+        const dados=await fetch(
+            MEALS+encodeURIComponent(comida)
+        ).then(r=>r.json());
+
+        /* Se a API encontrou receitas, cria um card para cada uma */
+        resultado.innerHTML=dados.meals
+            ? dados.meals.map(r=>card(r)).join("")
+            : "<p class='msg'>Nenhuma receita encontrada.</p>";
+
+    }catch{
+        resultado.innerHTML="<p class='msg'>Erro ao buscar receitas.</p>";
+    }
+}
+
+/*
+Função salvar():
+Envia uma receita para o MockAPI.
+
+method: POST significa criar/salvar um novo registro.
+body: são os dados enviados para o banco.
+*/
+async function salvar(name,imagem,categoria,origem){
+    await fetch(FAVORITOS,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+            name,
+            imagem,
+            categoria,
+            origem
+        })
+    });
+
+    alert("Receita salva!");
+}
+
+/*
+Função mostrarFavoritos():
+1. Faz GET no MockAPI.
+2. Recebe todos os favoritos salvos.
+3. Mostra cada favorito na tela.
+*/
+async function mostrarFavoritos(){
+    document.getElementById("areaFavoritos").style.display="block";
+    favoritos.innerHTML="<p class='msg'>Carregando...</p>";
+
+    try{
+        /* GET é o método padrão do fetch: buscar dados */
+        const dados=await fetch(FAVORITOS).then(r=>r.json());
+
+        favoritos.innerHTML=dados.length
+            ? dados.map(r=>card(r,true)).join("")
+            : "<p class='msg'>Nenhum favorito salvo.</p>";
+
+    }catch{
+        favoritos.innerHTML="<p class='msg'>Erro ao carregar favoritos.</p>";
+    }
+}
+
+/*
+Função remover():
+Apaga um favorito do MockAPI usando seu id.
+
+method: DELETE significa apagar um registro do banco.
+*/
+async function remover(id){
+    await fetch(`${FAVORITOS}/${id}`,{
+        method:"DELETE"
+    });
+
+    /* Atualiza a lista após apagar */
+    mostrarFavoritos();
+}
+
+/*
+Função dica():
+Simula o Ratatuin IA.
+*/
+function dica(nome,botao){
+    const area=botao.closest(".card").querySelector(".ia");
+
+    const dicas=[
+        `Para ${nome}, separe os ingredientes antes de começar.`,
+        `Prove o tempero aos poucos enquanto prepara ${nome}.`,
+        `Sirva ${nome} com uma bebida leve ou salada.`,
+        `Para uma versão saudável, prefira assar em vez de fritar.`,
+        `Finalize ${nome} com ervas ou queijo para melhorar o sabor.`
+    ];
+
+    /* Escolhe uma dica aleatória da lista */
+    const aleatoria=dicas[Math.floor(Math.random()*dicas.length)];
+
+    area.style.display="block";
+    area.innerHTML="✨ <b>Ratatuin IA:</b><br>"+aleatoria;
+}
+</script>
+
+</body>
+</html>
