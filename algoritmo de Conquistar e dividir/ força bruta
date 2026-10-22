@@ -1,0 +1,111 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyNuZ6MpF6gDzy/+Fw4f0V/n",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/luisangelisase-netizen/APi/blob/main/algoritmo%20de%20Conquistar%20e%20dividir/%20for%C3%A7a%20bruta\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Q4"
+      ],
+      "metadata": {
+        "id": "rd1QyHR9z8tn"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "\n",
+        "dna = input()\n",
+        "procurada = input()\n",
+        "\n",
+        "encontrada = False\n",
+        "\n",
+        "for i in range(len(dna) - len(procurada) + 1):\n",
+        "    j = 0\n",
+        "\n",
+        "    while j < len(procurada) and dna[i + j] == procurada[j]:\n",
+        "        j += 1\n",
+        "\n",
+        "    if j == len(procurada):\n",
+        "        print(\"Sequência encontrada na posição\", i + 1)\n",
+        "        encontrada = True\n",
+        "        break\n",
+        "\n",
+        "if not encontrada:\n",
+        "    print(\"Sequência não encontrada\")\n"
+      ],
+      "metadata": {
+        "id": "NI2RVd1a0Cd3"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Q5"
+      ],
+      "metadata": {
+        "id": "DJ67ZQSg1TCv"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "\n",
+        "def mdc(L, A):\n",
+        "    if A == 0:\n",
+        "        return L\n",
+        "    return mdc(A, L % A)\n",
+        "\n",
+        "L = int(input(\"L =  \"))\n",
+        "A = int(input(\"A = \"))\n",
+        "\n",
+        "print(mdc(L, A))\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "6UU14JaS1UCP",
+        "outputId": "3a21403d-be00-49d2-f2c0-10e22f6f314c"
+      },
+      "execution_count": 1,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "L = 168 168\n",
+            "A = 6464\n",
+            "8\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
